@@ -1,0 +1,16 @@
+Medicine_Name,Category,Units_Sold,Price_Per_Unit,Revenue,Stock_Left,Month
+Paracetamol,Pain Relief,120,10,1200,500,January
+Dolo 650,Pain Relief,150,15,2250,450,January
+Cetirizine,Allergy,90,12,1080,300,January
+Azithromycin,Antibiotic,80,50,4000,200,January
+Vitamin C,Supplements,110,20,2200,350,January
+Paracetamol,Pain Relief,130,10,1300,480,February
+Dolo 650,Pain Relief,170,15,2550,420,February
+Cetirizine,Allergy,100,12,1200,290,February
+Azithromycin,Antibiotic,85,50,4250,180,February
+Vitamin C,Supplements,125,20,2500,340,February
+Paracetamol,Pain Relief,140,10,1400,460,March
+Dolo 650,Pain Relief,180,15,2700,400,March
+Cetirizine,Allergy,105,12,1260,280,March
+Azithromycin,Antibiotic,95,50,4750,170,March
+Vitamin C,Supplements,135,20,2700,330,March

@@ -1,0 +1,10 @@
+venv/
+__py
+
+
+
+che__/
+*.pyc
+.DS_Store
+varg_medi.db
+*.pdf
