@@ -16,18 +16,17 @@ from dashboard.forecast import (
 # PAGE CONFIG
 # ---------------------------------
 st.set_page_config(
-    page_title="Varg-Medi Analytics",
+    page_title="Varg-Medi Analytics | AI Healthcare Dashboard",
     page_icon="💊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ---------------------------------
 # LOAD CUSTOM CSS
 # ---------------------------------
 def load_css():
-    with open(
-        "assets/style.css"
-    ) as f:
+    with open("assets/style.css") as f:
         st.markdown(
             f"<style>{f.read()}</style>",
             unsafe_allow_html=True
@@ -39,33 +38,20 @@ load_css()
 # LOGIN CHECK
 # ---------------------------------
 if "logged_in" not in st.session_state:
-    st.session_state[
-        "logged_in"
-    ] = False
+    st.session_state["logged_in"] = False
 
-if not st.session_state[
-    "logged_in"
-]:
+if not st.session_state["logged_in"]:
     auth_screen()
     st.stop()
 
 # ---------------------------------
 # ADMIN ACCESS
 # ---------------------------------
-if (
-    st.session_state.get(
-        "username"
-    ) == "admin"
-):
+if st.session_state.get("username") == "admin":
     admin_panel()
 
-    if st.sidebar.button(
-        "Logout"
-    ):
-        st.session_state[
-            "logged_in"
-        ] = False
-
+    if st.sidebar.button("Logout"):
+        st.session_state["logged_in"] = False
         st.rerun()
 
     st.stop()
@@ -74,49 +60,44 @@ if (
 # SIDEBAR
 # ---------------------------------
 st.sidebar.success(
-    f"👋 Welcome "
-    f"{st.session_state['username']}"
+    f"👋 Welcome {st.session_state['username']}"
 )
 
-if st.sidebar.button(
-    "Logout"
-):
-    st.session_state[
-        "logged_in"
-    ] = False
-
+if st.sidebar.button("Logout"):
+    st.session_state["logged_in"] = False
     st.rerun()
 
 # ---------------------------------
-# TITLE
+# TITLE + HERO SECTION
 # ---------------------------------
-st.title(
-    "💊 Varg-Medi Analytics"
-)
+st.title("💊 Varg-Medi Analytics")
+
+st.markdown("""
+### 🚀 AI Powered Healthcare Intelligence Dashboard
+
+Analyze medicine sales, predict future demand, monitor stock trends,  
+generate smart insights, and export professional business reports.
+""")
 
 st.caption(
-    "AI Powered Healthcare "
-    "and Medicine Analytics"
+    "Advanced Healthcare Analytics with Forecasting, "
+    "Business Intelligence, and Smart Recommendations"
 )
+
+st.divider()
 
 # ---------------------------------
 # LOAD DATA
 # ---------------------------------
-st.sidebar.header(
-    "📂 Dataset"
-)
+st.sidebar.header("📂 Dataset")
 
-uploaded_file = (
-    st.sidebar.file_uploader(
-        "Upload CSV File",
-        type=["csv"]
-    )
+uploaded_file = st.sidebar.file_uploader(
+    "Upload CSV File",
+    type=["csv"]
 )
 
 if uploaded_file is not None:
-    df = pd.read_csv(
-        uploaded_file
-    )
+    df = pd.read_csv(uploaded_file)
 else:
     df = pd.read_csv(
         "data/medicine_sales.csv"
@@ -125,88 +106,54 @@ else:
 # ---------------------------------
 # FILTERS
 # ---------------------------------
-st.sidebar.header(
-    "🔍 Filters"
+st.sidebar.header("🔍 Filters")
+
+selected_month = st.sidebar.multiselect(
+    "Select Month",
+    options=df["Month"].unique(),
+    default=df["Month"].unique()
 )
 
-selected_month = (
-    st.sidebar.multiselect(
-        "Select Month",
-        options=df[
-            "Month"
-        ].unique(),
-        default=df[
-            "Month"
-        ].unique()
-    )
+selected_category = st.sidebar.multiselect(
+    "Select Category",
+    options=df["Category"].unique(),
+    default=df["Category"].unique()
 )
 
-selected_category = (
-    st.sidebar.multiselect(
-        "Select Category",
-        options=df[
-            "Category"
-        ].unique(),
-        default=df[
-            "Category"
-        ].unique()
-    )
-)
-
-medicine_search = (
-    st.sidebar.text_input(
-        "Search Medicine"
-    )
+medicine_search = st.sidebar.text_input(
+    "Search Medicine"
 )
 
 filtered_df = df[
-    (
-        df["Month"]
-        .isin(
-            selected_month
-        )
-    )
+    (df["Month"].isin(selected_month))
     &
-    (
-        df["Category"]
-        .isin(
-            selected_category
-        )
-    )
+    (df["Category"].isin(selected_category))
 ]
 
 if medicine_search:
-    filtered_df = (
+    filtered_df = filtered_df[
         filtered_df[
-            filtered_df[
-                "Medicine_Name"
-            ].str.contains(
-                medicine_search,
-                case=False
-            )
-        ]
-    )
+            "Medicine_Name"
+        ].str.contains(
+            medicine_search,
+            case=False
+        )
+    ]
 
 # ---------------------------------
 # KPI CALCULATIONS
 # ---------------------------------
-total_revenue = (
-    filtered_df[
-        "Revenue"
-    ].sum()
-)
+total_revenue = filtered_df[
+    "Revenue"
+].sum()
 
-total_units = (
-    filtered_df[
-        "Units_Sold"
-    ].sum()
-)
+total_units = filtered_df[
+    "Units_Sold"
+].sum()
 
-stock_left = (
-    filtered_df[
-        "Stock_Left"
-    ].sum()
-)
+stock_left = filtered_df[
+    "Stock_Left"
+].sum()
 
 avg_price = round(
     filtered_df[
@@ -215,10 +162,8 @@ avg_price = round(
     2
 )
 
-predicted_sales = (
-    predict_sales(
-        filtered_df
-    )
+predicted_sales = predict_sales(
+    filtered_df
 )
 
 top_revenue_med = (
@@ -248,9 +193,9 @@ best_month = (
 # ---------------------------------
 # KPI SECTION
 # ---------------------------------
-col1, col2, col3, col4, col5 = (
-    st.columns(5)
-)
+st.subheader("📊 Business KPIs")
+
+col1, col2, col3, col4, col5 = st.columns(5)
 
 col1.metric(
     "💰 Revenue",
@@ -286,9 +231,7 @@ st.subheader(
     "🧠 Smart Insights"
 )
 
-col6, col7, col8 = (
-    st.columns(3)
-)
+col6, col7, col8 = st.columns(3)
 
 with col6:
     st.success(
@@ -316,7 +259,7 @@ st.subheader(
 )
 
 if st.button(
-    "Generate PDF"
+    "Generate PDF Report"
 ):
     pdf_path = generate_pdf_report(
         total_revenue,
@@ -340,16 +283,14 @@ if st.button(
             file_name=(
                 "varg_medi_report.pdf"
             ),
-            mime=(
-                "application/pdf"
-            )
+            mime="application/pdf"
         )
 
 # ---------------------------------
-# CHARTS
+# ANALYTICS CHARTS
 # ---------------------------------
 st.subheader(
-    "📊 Analytics"
+    "📊 Analytics Dashboard"
 )
 
 medicine_revenue = (
@@ -404,17 +345,16 @@ st.subheader(
     "📈 6 Month Forecast"
 )
 
-forecast_df = (
-    future_forecast(
-        filtered_df
-    )
+forecast_df = future_forecast(
+    filtered_df
 )
 
 forecast_fig = px.line(
     forecast_df,
     x="Month",
     y="Predicted_Sales",
-    markers=True
+    markers=True,
+    title="Future Sales Prediction"
 )
 
 st.plotly_chart(
@@ -429,10 +369,8 @@ st.subheader(
     "🔥 Correlation Heatmap"
 )
 
-numeric_df = (
-    filtered_df.select_dtypes(
-        include=["number"]
-    )
+numeric_df = filtered_df.select_dtypes(
+    include=["number"]
 )
 
 fig, ax = plt.subplots(
